@@ -31,9 +31,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         include:
-          - os: windows-latest
           - os: ubuntu-latest
             container: registry.gitlab.steamos.cloud/steamrt/sniper/sdk
     steps:
@@ -51,7 +50,14 @@ jobs:
           ref: master
           path: mmsource-2.0
           submodules: recursive
-
+    
+      - name: Checkout hl2sdk-cs2
+        uses: actions/checkout@v4
+        with:
+          repository: alliedmodders/hl2sdk
+          ref: cs2
+          path: hl2sdk-cs2
+          
       - name: Checkout AMBuild
         uses: actions/checkout@v4
         with:
@@ -72,7 +78,7 @@ jobs:
         shell: bash
         run: |
           mkdir build && cd build
-          python ../configure.py --enable-optimize --sdks cs2
+          python ../configure.py --enable-optimize --plugin-name=GEN --plugin-alias=GEN --sdks=cs2 --targets=x86_64
           ambuild
 
       - name: Upload artifact
