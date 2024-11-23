@@ -183,7 +183,7 @@ void Skin::StartupServer(const GameSessionConfiguration_t& config, ISource2World
 	#else
 	CModule libserver(g_pSource2Server);
 	FnUTIL_ClientPrintAll = libserver.FindPatternSIMD("55 48 89 E5 41 57 49 89 D7 41 56 49 89 F6 41 55 41 89 FD").RCast< decltype(FnUTIL_ClientPrintAll) >();
-	FnGiveNamedItem = libserver.FindPatternSIMD("55 48 89 E5 41 57 41 56 49 89 CE 41 55 49 89 F5 41 54 49 89 D4 53 48 89").RCast<decltype(FnGiveNamedItem)>();
+	FnGiveNamedItem = libserver.FindPatternSIMD("55 48 89 E5 41 57 41 56 49 89 D6 41 55 49 89 CD 41 54 49 89 F4 53 48 89 FB 48 8D 3D").RCast<decltype(FnGiveNamedItem)>();
 	FnEntityRemove = libserver.FindPatternSIMD("48 85 F6 74 0B 48 8B 76 10 E9 B2 FE FF FF").RCast<decltype(FnEntityRemove)>();
 	FnSubClassChange = libserver.FindPatternSIMD("55 48 89 E5 41 57 41 56 41 55 41 54 53 48 81 EC C8 00 00 00 83 BE 38 04 00 00 01 0F 8E 47 02").RCast<decltype(FnSubClassChange)>();
 	#endif
@@ -278,7 +278,7 @@ void CEntityListener::OnEntitySpawned(CEntityInstance* pEntity)
 }
 
 // weapon: skin 38 0 0 knife: skin 38 0 0 515
-CON_COMMAND_F(ws, "ws", FCVAR_CLIENT_CAN_EXECUTE)
+CON_COMMAND_F(ws, "gen", FCVAR_CLIENT_CAN_EXECUTE)
 {
 	if(context.GetPlayerSlot() == -1)return;
 	CCSPlayerController* pPlayerController = (CCSPlayerController*)g_pEntitySystem->GetBaseEntity((CEntityIndex)(context.GetPlayerSlot().Get() + 1));
@@ -299,7 +299,7 @@ CON_COMMAND_F(ws, "ws", FCVAR_CLIENT_CAN_EXECUTE)
 	{
 		if(args.ArgC() != 5)
 		{
-			sprintf(buf, " \x04MetaCoreano | \x02%s\x01 Escribi en la consola: \x04skin ID PATTERN DESGASTE",pPlayerController->m_iszPlayerName());
+			sprintf(buf, " \x04GEN | \x02%s\x01 Escribi en la consola: \x04skin ID PATRON DE DESGASTE",pPlayerController->m_iszPlayerName());
 			FnUTIL_ClientPrintAll(3, buf,nullptr, nullptr, nullptr, nullptr);
 			return;
 		}
@@ -309,7 +309,7 @@ CON_COMMAND_F(ws, "ws", FCVAR_CLIENT_CAN_EXECUTE)
 	{
 		if(args.ArgC() != 4)
 		{
-			sprintf(buf, "  \x04MetaCoreano | \x02%s\x01 Escribi en la consola: \x04skin ID PATTERN DESGASTE",pPlayerController->m_iszPlayerName());
+			sprintf(buf, "  \x04GEN | \x02%s\x01 Escribi en la consola: \x04skin ID PATRON DE DESGASTE",pPlayerController->m_iszPlayerName());
 			FnUTIL_ClientPrintAll(3, buf,nullptr, nullptr, nullptr, nullptr);
 			return;
 		}
@@ -328,7 +328,7 @@ CON_COMMAND_F(ws, "ws", FCVAR_CLIENT_CAN_EXECUTE)
 	//pItemServices->GiveNamedItem(weapon_name->second.c_str());
 	// g_pGameRules->PlayerRespawn(static_cast<CCSPlayerPawn*>(pPlayerPawn));
 	META_CONPRINTF( "called by %lld\n", steamid);
-	sprintf(buf, " \x04MetaCoreano | \x02%s \x01Tu skin fue modificada para: \x02%d \x01Pattern: \x02%d\x01 Desgaste: \x02%f",pPlayerController->m_iszPlayerName(),g_PlayerSkins[steamid][weaponId].m_nFallbackPaintKit,g_PlayerSkins[steamid][weaponId].m_nFallbackSeed,g_PlayerSkins[steamid][weaponId].m_flFallbackWear);
+	sprintf(buf, " \x04GEN | \x02%s \x01Tu skin fue modificada para: \x02%d \x01Pattern: \x02%d\x01 Desgaste: \x02%f",pPlayerController->m_iszPlayerName(),g_PlayerSkins[steamid][weaponId].m_nFallbackPaintKit,g_PlayerSkins[steamid][weaponId].m_nFallbackSeed,g_PlayerSkins[steamid][weaponId].m_flFallbackWear);
 	FnUTIL_ClientPrintAll(3, buf,nullptr, nullptr, nullptr, nullptr);
 }
 
