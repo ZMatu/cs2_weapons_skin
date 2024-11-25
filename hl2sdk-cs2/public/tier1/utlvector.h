@@ -225,15 +225,6 @@ public:
 	CUtlVectorFixedGrowable( int growSize = 0 ) : BaseClass( growSize, MAX_SIZE ) {}
 };
 
-template< class T, class B = short >
-class CUtlLeanVectorBase
-{
-private:
-	B m_nAllocationCount;
-	B m_nGrowSize;
-	T* m_pMemory;
-};
-
 //-----------------------------------------------------------------------------
 // The CUtlVectorConservative class:
 // A array class with a conservative allocation scheme
@@ -1170,6 +1161,11 @@ public:
 class CUtlStringList : public CUtlVectorAutoPurge< char *>
 {
 public:
+	~CUtlStringList()
+	{
+		PurgeAndDeleteElements();
+	}
+
 	void CopyAndAddToTail( char const *pString )			// clone the string and add to the end
 	{
 		char *pNewStr = new char[1 + strlen( pString )];
@@ -1182,25 +1178,64 @@ public:
 		return strcmp( *sz1, *sz2 );
 	}
 
+	inline void PurgeAndDeleteElements()
+	{
+		for( int i = 0; i < m_Size; i++ )
+		{
+			delete[] Element(i);
+		}
+		Purge();
+	}
 };
 
 
 
 // <Sergiy> placing it here a few days before Cert to minimize disruption to the rest of codebase
-class CSplitString: public CUtlVector<char*, CUtlMemory<char*, int> >
+class CSplitString : public CUtlVector<char *, CUtlMemory<char *, int>>
 {
 public:
-	CSplitString(const char *pString, const char *pSeparator);
-	CSplitString(const char *pString, const char **pSeparators, int nSeparators);
-	~CSplitString();
-	//
-	// NOTE: If you want to make Construct() public and implement Purge() here, you'll have to free m_szBuffer there
-	//
+	// Splits the string based on separator provided
+	// Example: string "test;string string2;here" with a separator ";"
+	// results in [ "test", "string string2", "here" ] array entries.
+	// Separator can be multicharacter, i.e. "-;" would split string like
+	// "test-;string" into [ "test", "string" ]
+	CSplitString( const char *pString, const char *pSeparator, bool include_empty = false ) : m_szBuffer( nullptr ), m_nBufferSize( 0 )
+	{
+		Split( pString, -1, &pSeparator, 1, include_empty );
+	}
+
+	// Splits the string based on array of separators provided
+	// Example: string "test;string,string2;here" with a separators [ ";", "," ]
+	// results in [ "test", "string", "string2", "here" ] array entries.
+	// Separator can be multicharacter, i.e. "-;" would split string like
+	// "test-;string" into [ "test", "string" ]
+	CSplitString( const char *pString, const char **pSeparators, int nSeparators, bool include_empty = false ) : m_szBuffer( nullptr ), m_nBufferSize( 0 )
+	{
+		Split( pString, -1, pSeparators, nSeparators, include_empty );
+	}
+
+	~CSplitString()
+	{
+		if (m_szBuffer)
+			delete[] m_szBuffer;
+	}
+
+	// Works the same way as CSplitString::Split with the only exception that it allows you 
+	// to provide single string of separators like ";,:" which will then get used to separate string
+	// instead of providing an array of separators, but doesn't support multicharacter separators cuz of that!
+	DLL_CLASS_IMPORT void SetPacked( const char *pString, const char *pSeparators, bool include_empty = false, int stringSize = -1 );
+
 private:
-	void Construct(const char *pString, const char **pSeparators, int nSeparators);
-	void PurgeAndDeleteElements();
+	DLL_CLASS_IMPORT void Split(const char *pString, int stringSize, const char **pSeparators, int nSeparators, bool include_empty = false );
+
+	void PurgeAndDeleteElements()
+	{
+		Purge();
+	}
+
 private:
 	char *m_szBuffer; // a copy of original string, with '\0' instead of separators
+	int m_nBufferSize;
 };
 
 
