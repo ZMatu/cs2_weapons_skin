@@ -426,7 +426,10 @@ class MMSPluginConfig(object):
 
     if sdk.name in ['dota', 'cs2']:
       compiler.defines += ['META_IS_SOURCE2']
-
+      binary.sources += [
+        os.path.join(sdk['path'], 'public', 'tier0', 'memoverride.cpp'),
+        os.path.join(sdk['path'], 'tier1', 'convar.cpp'),
+      ]
     for path in paths:
       compiler.cxxincludes += [os.path.join(sdk.path, *path)]
 
@@ -469,12 +472,15 @@ class MMSPluginConfig(object):
         compiler.linkflags += ['-Wl,-z,origin']
       compiler.postlink += [tier1]
 
-      if sdk.name in ['blade', 'insurgency', 'doi', 'csgo', 'cs2', 'dota']:
+      if sdk.name in ['cs2']:
         if compiler.target.arch == 'x86_64':
           compiler.postlink += [os.path.join(lib_folder, 'interfaces.a')]
         else:
           compiler.postlink += [os.path.join(lib_folder, 'interfaces_i486.a')]
-      
+    binary.custom = [builder.tools.Protoc(protoc = sdk_target.protoc, sources = [
+      os.path.join(sdk['path'], 'common', 'network_connection.proto'),
+    ])]
+
       if sdk.name == 'bms':
         compiler.postlink += [os.path.join(lib_folder, 'mathlib.a')]
 
