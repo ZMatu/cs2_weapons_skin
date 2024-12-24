@@ -189,16 +189,16 @@ void Skin::StartupServer(const GameSessionConfiguration_t& config, ISource2World
 	#ifdef _WIN32
 	FnUTIL_ClientPrint = (UTIL_ClientPrint_t)FindSignature("server.dll", "\x48\x85\xC9\x0F\x84\x3F\x3F\x3F\x3F\x48\x8B\xC4\x48\x89\x58\x18");
 	FnUTIL_ClientPrintAll = (UTIL_ClientPrintAll_t)FindSignature("server.dll", "\x48\x89\x5C\x24\x08\x48\x89\x6C\x24\x10\x48\x89\x74\x24\x18\x57\x48\x81\xEC\x70\x01\x3F\x3F\x8B\xE9");
-	FnGiveNamedItem = (GiveNamedItem_t)FindSignature("server.dll", "\x48\x89\x5C\x24\x18\x48\x89\x74\x24\x20\x55\x57\x41\x54\x41\x56\x41\x57\x48\x8D\x6C\x24\xD9");
+	FnGiveNamedItem = (GiveNamedItem_t)FindSignature("server.dll", "\x48\x89\x5C\x24\x3F\x48\x89\x74\x24\x3F\x55\x57\x41\x3F\x41\x3F\x41\x3F\x48\x3F\x3F\x3F\x3F\x48\x3F\x3F\x3F\x3F\x3F\x3F\x4D\x3F\x3F\x48");
 	FnEntityRemove = (EntityRemove_t)FindSignature("server.dll", "\x48\x85\xD2\x0F\x3F\x3F\x3F\x3F\x3F\x57\x48\x3F\x3F\x3F\x48\x89\x3F\x3F\x3F\x48\x8B\xF9\x48\x8B");
-	FnSubClassChange = (SubClassChange_t)FindSignature("server.dll", "\x40\x55\x41\x57\x48\x83\xEC\x78\x83\xBA\x38\x04");
+	FnSubClassChange = (SubClassChange_t)FindSignature("server.dll", "\x48\x89\x6C\x24\x3F\x56\x48\x83\xEC\x3F\x48\x8B\xEA\x48\x8B\xF1\xE8\x3F\x3F\x3F\x3F\x84\xC0\x0F\x84");
 	#else
 	CModule libserver(g_pSource2Server);
 	FnUTIL_ClientPrint = libserver.FindPatternSIMD("55 48 89 E5 41 57 49 89 CF 41 56 49 89 D6 41 55 41 89 F5 41 54 4C 8D A5 A0 FE FF FF").RCast< decltype(FnUTIL_ClientPrint) >();
 	FnUTIL_ClientPrintAll = libserver.FindPatternSIMD("55 48 89 E5 41 57 49 89 D7 41 56 49 89 F6 41 55 41 89 FD").RCast< decltype(FnUTIL_ClientPrintAll) >();
-	FnGiveNamedItem = libserver.FindPatternSIMD("55 48 89 E5 41 57 41 56 49 89 D6 41 55 49 89 CD 41 54 49 89 F4 53 48 89 FB 48 8D 3D").RCast<decltype(FnGiveNamedItem)>();
-	FnEntityRemove = libserver.FindPatternSIMD("48 85 F6 74 0B 48 8B 76 10 E9 B2 FE FF FF").RCast<decltype(FnEntityRemove)>();
-	FnSubClassChange = libserver.FindPatternSIMD("55 48 89 E5 41 57 41 56 41 55 49 89 F5 41 54 49 89 FC 53 48 81 EC A8 00 00 00").RCast<decltype(FnSubClassChange)>();
+	FnGiveNamedItem = libserver.FindPatternSIMD("48 89 FE 48 85 FF 74 ? 48 8D 05 ? ? ? ? 48").RCast<decltype(FnGiveNamedItem)>();
+	FnEntityRemove = libserver.FindPatternSIMD("55 48 89 ? 41 ? 49 89 ? 41 ? 49 89 ? E8 ? ? ? ? 49 39").RCast<decltype(FnEntityRemove)>();
+	FnSubClassChange = libserver.FindPatternSIMD("55 48 89 E5 41 57 41 56 41 55 49 89 F5 41 54 49 89 FC 53 48 81 EC ? ? ? ? E8 ? ? ? ? 84 C0 74 ? 48 8D 05").RCast<decltype(FnSubClassChange)>();
 	#endif
 	g_pGameRules = nullptr;
 	
